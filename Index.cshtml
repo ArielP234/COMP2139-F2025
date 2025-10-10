@@ -1,0 +1,88 @@
+@* indicates that the view expects a list of Project objects as its model *@ 
+
+@model List<Project>
+
+@{ 
+
+    ViewData["Title"] = "Projects"; 
+
+} 
+
+ 
+ 
+
+<h2>Projects</h2> 
+
+// Lab4 - Part5 - #1 
+
+<a asp-action="Create" class="btn btn-primary">Create New Project</a> <!--Lab4 - Part5 - #1 --> 
+
+@if (Model.Any())   // to determine if there are any projects to display 
+
+{ 
+
+    <table class="table"> 
+
+        <thead> 
+
+        <tr> 
+
+            <th>ID</th> 
+
+            <th>Name</th> 
+
+            <th>Description</th> 
+
+            <th>Action</th>
+
+            <!-- Add other project properties as needed --> 
+
+        </tr> 
+
+        </thead> 
+
+        <tbody> 
+
+        <!-- A foreach loop is used to iterate over each Project in the model and display its properties in the table rows. --> 
+
+        @foreach (var project in Model) 
+
+        { 
+
+            <tr> 
+
+                <td>@project.ProjectId</td> 
+
+                <td>@project.Name</td> 
+
+                <td>@project.Description</td> 
+
+                 
+
+                <td><!--Lab4 - Part5 - #1 --> 
+                    
+                    <a asp-action="Details" asp-route-id="@project.ProjectId" class="btn btn-info">Details</a> 
+
+                    <a asp-action="Delete" asp-route-id="@project.ProjectId" class="btn btn-danger">Delete</a> 
+
+                </td> 
+
+                <!-- Render other project properties as needed --> 
+
+            </tr> 
+
+        } 
+
+        </tbody> 
+
+    </table> 
+
+} 
+
+else 
+
+{ 
+
+    <p>No projects available.</p> 
+
+}
