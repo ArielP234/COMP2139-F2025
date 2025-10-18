@@ -1,0 +1,114 @@
+﻿@model VirtualEventTicketing.Models.ViewModels.EventOverviewViewModel
+@{
+    ViewData["Title"] = "Event Overview";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Event Overview</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Events
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body text-center">
+                <h2 class="display-4">@Model.TotalEvents</h2>
+                <p class="mb-0">Total Events</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body text-center">
+                <h2 class="display-4">@Model.TotalCategories</h2>
+                <p class="mb-0">Categories</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body text-center">
+                <h2 class="display-4">@Model.EventsWithLowAvailability.Count</h2>
+                <p class="mb-0">Low Availability</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body text-center">
+                <h2 class="display-4">@Model.SoldOutEvents.Count</h2>
+                <p class="mb-0">Sold Out</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle text-warning"></i> 
+                    Events with Low Availability (< 5 tickets)
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.EventsWithLowAvailability.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var eventItem in Model.EventsWithLowAvailability)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@eventItem.Title</h6>
+                                    <span class="badge bg-warning">@eventItem.AvailableTickets left</span>
+                                </div>
+                                <p class="mb-1 small text-muted">@eventItem.Category?.Name</p>
+                                <small>@eventItem.Date.ToString("MMM dd, yyyy")</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center">No events with low availability.</p>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-times-circle text-danger"></i> 
+                    Sold Out Events
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.SoldOutEvents.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var eventItem in Model.SoldOutEvents)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@eventItem.Title</h6>
+                                    <span class="badge bg-danger">Sold Out</span>
+                                </div>
+                                <p class="mb-1 small text-muted">@eventItem.Category?.Name</p>
+                                <small>@eventItem.Date.ToString("MMM dd, yyyy")</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center">No sold out events.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

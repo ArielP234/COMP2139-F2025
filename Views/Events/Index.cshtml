@@ -1,0 +1,156 @@
+﻿@model VirtualEventTicketing.Models.ViewModels.EventListViewModel
+@{
+    ViewData["Title"] = "Events";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Events</h1>
+    <div>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+        <a asp-action="Overview" class="btn btn-info">
+            <i class="fas fa-chart-bar"></i> Overview
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Filters & Search</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Index" method="get">
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="searchString" value="@Model.SearchString" 
+                               class="form-control" placeholder="Search events...">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">All Categories</option>
+                            @foreach (var category in Model.Categories)
+                            {
+                                <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">
+                                    @category.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select name="sortOrder" class="form-select">
+                            <option value="">Date (Default)</option>
+                            <option value="title_asc" selected="@(Model.SortOrder == "title_asc")">Title A-Z</option>
+                            <option value="title_desc" selected="@(Model.SortOrder == "title_desc")">Title Z-A</option>
+                            <option value="date_asc" selected="@(Model.SortOrder == "date_asc")">Date (Oldest)</option>
+                            <option value="date_desc" selected="@(Model.SortOrder == "date_desc")">Date (Newest)</option>
+                            <option value="price_asc" selected="@(Model.SortOrder == "price_asc")">Price (Low-High)</option>
+                            <option value="price_desc" selected="@(Model.SortOrder == "price_desc")">Price (High-Low)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <a asp-action="Index" class="btn btn-secondary">Clear All</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        @if (Model.Events.Any())
+        {
+            <div class="row">
+                @foreach (var eventItem in Model.Events)
+                {
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title">@eventItem.Title</h5>
+                                    <span class="badge bg-secondary">@eventItem.Category?.Name</span>
+                                </div>
+                                <p class="card-text text-muted small">@eventItem.Description</p>
+                                
+                                <div class="event-details mb-3">
+                                    <div class="mb-1">
+                                        <i class="fas fa-calendar text-primary"></i>
+                                        <small>@eventItem.Date.ToString("MMM dd, yyyy hh:mm tt")</small>
+                                    </div>
+                                    <div class="mb-1">
+                                        <i class="fas fa-ticket-alt text-success"></i>
+                                        <small>
+                                            @if (eventItem.TicketPrice == 0)
+                                            {
+                                                <span class="text-success fw-bold">FREE</span>
+                                            }
+                                            else
+                                            {
+                                                <span>$@eventItem.TicketPrice</span>
+                                            }
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-users text-info"></i>
+                                        <small>
+                                            @eventItem.AvailableTickets tickets available
+                                            @if (eventItem.AvailableTickets == 0)
+                                            {
+                                                <span class="badge bg-danger ms-1">Sold Out</span>
+                                            }
+                                            else if (eventItem.AvailableTickets < 5)
+                                            {
+                                                <span class="badge bg-warning ms-1">Low Availability</span>
+                                            }
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Details" asp-route-id="@eventItem.Id" 
+                                       class="btn btn-outline-primary btn-sm flex-fill">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@eventItem.Id" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@eventItem.Id" 
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                @if (eventItem.AvailableTickets > 0)
+                                {
+                                    <div class="d-grid mt-2">
+                                        <a asp-controller="Purchases" asp-action="Create" asp-route-eventId="@eventItem.Id" 
+                                           class="btn btn-success btn-sm">
+                                            <i class="fas fa-shopping-cart"></i> Buy Tickets
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h3>No Events Found</h3>
+                <p class="text-muted">Try adjusting your search criteria or create a new event.</p>
+                <a asp-action="Create" class="btn btn-primary">Create Your First Event</a>
+            </div>
+        }
+    </div>
+</div>

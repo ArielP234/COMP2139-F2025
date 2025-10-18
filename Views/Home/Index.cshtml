@@ -1,0 +1,128 @@
+﻿@model VirtualEventTicketing.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="hero-section bg-dark text-white rounded-3 p-5 mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-4 fw-bold">Welcome to VirtualEventTicketing</h1>
+            <p class="lead">Discover amazing virtual events, webinars, concerts, and workshops from the comfort of your home.</p>
+            <a class="btn btn-primary btn-lg mt-3" asp-controller="Events" asp-action="Index">
+                <i class="fas fa-calendar-alt"></i> Browse Events
+            </a>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="fas fa-video fa-8x text-primary"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body text-center">
+                <h3>@Model.TotalUpcomingEvents</h3>
+                <p class="mb-0">Upcoming Events</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body text-center">
+                <h3>@Model.Categories.Count</h3>
+                <p class="mb-0">Categories</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body text-center">
+                <h3>@Model.FeaturedEvents.Count</h3>
+                <p class="mb-0">Featured Events</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body text-center">
+                <h3>Virtual</h3>
+                <p class="mb-0">All Events</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mb-4">Featured Events</h2>
+
+@if (Model.FeaturedEvents.Any())
+{
+    <div class="row">
+        @foreach (var eventItem in Model.FeaturedEvents)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@eventItem.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <span class="badge bg-secondary">@eventItem.Category?.Name</span>
+                        </h6>
+                        <p class="card-text">@eventItem.Description</p>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> @eventItem.Date.ToString("MMM dd, yyyy hh:mm tt")
+                            </small><br>
+                            <small class="text-muted">
+                                <i class="fas fa-ticket-alt"></i> 
+                                @if (eventItem.TicketPrice == 0)
+                                {
+                                    <span class="text-success">FREE</span>
+                                }
+                                else
+                                {
+                                    <span>$@eventItem.TicketPrice</span>
+                                }
+                            </small><br>
+                            <small class="text-muted">
+                                <i class="fas fa-users"></i> @eventItem.AvailableTickets tickets available
+                                @if (eventItem.AvailableTickets < 5)
+                                {
+                                    <span class="badge bg-warning ms-1">Low Availability</span>
+                                }
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Events" asp-action="Details" asp-route-id="@eventItem.Id" 
+                               class="btn btn-outline-primary btn-sm">View Details</a>
+                            <a asp-controller="Purchases" asp-action="Create" asp-route-eventId="@eventItem.Id" 
+                               class="btn btn-success btn-sm">Buy Tickets</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No featured events available!</h4>
+        <p class="mb-0">Check back later for upcoming events or <a asp-controller="Events" asp-action="Create" class="alert-link">create a new event</a>.</p>
+    </div>
+}
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>Ready to host your own event?</h3>
+                <p class="text-muted">Create and manage virtual events with our easy-to-use platform.</p>
+                <a class="btn btn-outline-primary" asp-controller="Events" asp-action="Create">
+                    <i class="fas fa-plus"></i> Create New Event
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

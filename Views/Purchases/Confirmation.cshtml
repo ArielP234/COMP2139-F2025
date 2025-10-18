@@ -1,0 +1,86 @@
+﻿@model VirtualEventTicketing.Models.Purchase
+@{
+    ViewData["Title"] = "Purchase Confirmation";
+}
+
+<div class="text-center mb-5">
+    <div class="mb-4">
+        <i class="fas fa-check-circle text-success fa-5x"></i>
+    </div>
+    <h1 class="display-4 text-success">Purchase Confirmed!</h1>
+    <p class="lead">Thank you for your purchase. Your tickets have been reserved.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="card-title mb-0">Order Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Order Information</h6>
+                        <p class="mb-1"><strong>Order #:</strong> @Model.Id</p>
+                        <p class="mb-1"><strong>Purchase Date:</strong> @Model.PurchaseDate.ToString("MMM dd, yyyy hh:mm tt")</p>
+                        <p class="mb-1"><strong>Total Amount:</strong> $@Model.TotalAmount</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Customer Information</h6>
+                        <p class="mb-1"><strong>Name:</strong> @Model.CustomerName</p>
+                        <p class="mb-1"><strong>Email:</strong> @Model.CustomerEmail</p>
+                    </div>
+                </div>
+
+                <h6>Tickets Purchased</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.PurchaseItems)
+                            {
+                                <tr>
+                                    <td>@item.Event.Title</td>
+                                    <td>@item.Quantity</td>
+                                    <td>$@item.UnitPrice</td>
+                                    <td>$@(item.Quantity * item.UnitPrice)</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-success">
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>$@Model.TotalAmount</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body text-center">
+                <h5>What's Next?</h5>
+                <p class="text-muted">
+                    You will receive a confirmation email with your ticket details. 
+                    Keep this order number for your records: <strong>#@Model.Id</strong>
+                </p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a asp-controller="Events" asp-action="Index" class="btn btn-primary">
+                        <i class="fas fa-calendar"></i> Browse More Events
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>l>
