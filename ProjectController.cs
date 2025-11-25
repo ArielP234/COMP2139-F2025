@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using COMP2139_ICE.Areas.ProjectManagement.Models;
 using COMP2139_ICE.Data;
-using COMP2139_ICE.Models;
-using System.Linq;
-using COMP2139_F2025.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace COMP2139_ICE.Controllers
-
+namespace COMP2139_ICE.Areas.ProjectManagement.Controllers
+{
+    [Area("ProjectManagement")]
+    [Route("[area]/[controller]/[action]")]
     public class ProjectController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,125 +16,170 @@ namespace COMP2139_ICE.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        [HttpGet("")] //Lab6-Part2#1
+        public async Task<IActionResult> Index() //Lab9
         {
-            /*
-            //Feel free to add more projects here
-            var projects = new List<Project>()
-            {
-                new Project { ProjectId = 1, Name = "Project 1", Description = "First Project" }
-                //Feel free to add more projects here
-            };
-            */
-
-            var projects = _context.Projects.ToList();
+            var projects = await _context.Projects.ToListAsync(); //Lab9
             return View(projects);
         }
 
-        [HttpGet]
+        [HttpGet("Create")] //Lab6-Part2#1
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        //Lab4 - Part2 - #1
+        [HttpPost("Create")] //Lab6-Part2#1
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Project project)
+        public async Task<IActionResult> Create(Project project) //Lab9
         {
             if (ModelState.IsValid)
             {
-                _context.Add(project);
-                _context.SaveChanges();
+                // Convert to UTC before saving
+                project.StartDate = ToUtc(project.StartDate);
+                project.EndDate = ToUtc(project.EndDate);
+
+                await _context.Projects.AddAsync(project); //Lab9
+                await _context.SaveChangesAsync(); //Lab9
                 return RedirectToAction("Index");
-
-            }
-            return view(project);
-        }
-
-        [HttpGet]
-        public IActionResult Details(int id)
-        {
-            /*
-            var project = new Project { ProjectId = id, Name = "Project " + id, Description = "Details of Project " + id };
-            */
-            var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
             }
 
             return View(project);
         }
-        [HttpGet]
 
-        public IActionResult Edit(int id)
+        private DateTime ToUtc(DateTime input)
         {
-            var project =_context.Projects.Find(id)
+            if (input.Kind == DateTimeKind.Utc)
+                return input;
+            if (input.Kind == DateTimeKind.Unspecified)
+                return DateTime.SpecifyKind(input, DateTimeKind.Utc); // assume local is already UTC
+            return input.ToUniversalTime();
+        }
+
+        //Lab4 - Part3 - #1
+        [HttpGet("Edit/{id:int?}")] //Lab6-Part2#1
+        public async Task<IActionResult> Edit(int id) //Lab9
+        {
+            var project = await _context.Projects.FindAsync(id); //Lab9
             if (project == null)
             {
-                return NotFound();
-            }    
+                return NotFound(); // Returns a 404 error if the project doesn't exist.
+            }
             return View(project);
         }
-        
-        //Lab4 - Part3 - #2 
-        [HttpPost]
+
+        //Lab4 - Part3 - #2
+        [HttpPost("Edit/{id:int?}")] //Lab6-Part2#1
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("ProjectId","Name","Description")] Project project) 
+        public async Task<IActionResult> Edit(int id, [Bind("ProjectId,Name,Description")] Project project) //Lab9
+        {
+            if (id != project.ProjectId)
+            {
+                return NotFound();
+            }
 
-        { 
-            if (id != project.ProjectId) 
-            { 
-                return NotFound(); 
-            } 
-         
-            if (ModelState .IsValid) 
-            { 
+            if (ModelState.IsValid)
+            {
                 try
-                { 
-                    _context.Projects.Update(project); 
-                    _context.SaveChanges(); 
-                } 
-                catch (DbUpdateConcurrencyException) 
-                { 
-                    if (!ProjectExists(project.ProjectId)) 
-                    { 
-                        return NotFound(); 
-                    } 
-                    else 
-                    { 
-                        throw; 
-                    } 
-
-                } 
-                return RedirectToAction("Index"); 
+                {
+                    _context.Projects.Update(project);
+                    await _context.SaveChangesAsync(); //Lab9
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await ProjectExists(project.ProjectId)) //Lab9
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index");
             }
-            return View(project); 
-        } 
+            return View(project);
+        }
 
-        private bool ProjectExists(int id) 
-        { 
-            return _context.Projects.Any(e => e.ProjectId == id); 
-        }
-        
-        [HttpGet]
-        public IActionResult Delete(int id)
+        private async Task<bool> ProjectExists(int id) //Lab9
         {
-           var project= _context.Projects.FirstOrDefault(p: Project  => p.ProjectId == id);
-           if ()
-           {
-               return NotFound();
-           }
-           return View(project);
+            return await _context.Projects.AnyAsync(e => e.ProjectId == id);
         }
-        
-        [HttpPost, ActionName("DeleteConfimed")]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+
+        //Lab4 - Part3 - #2
+        [HttpGet("Details/{id:int?}")] //Lab6-Part2#1
+        public async Task<IActionResult> Details(int id) //Lab9
         {
-            var project= _context.Projects.Find(id);
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id); //Lab9
             if (project == null)
+            {
+                return NotFound();
+            }
+            return View(project);
+        }
+
+        //Lab4 - Part4 - #1
+        [HttpGet("Delete/{id:int?}")] //Lab6-Part2#1
+        public async Task<IActionResult> Delete(int id) //Lab9
+        {
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id); //Lab9
+            if (project == null)
+            {
+                return NotFound();
+            }
+            return View(project);
+        }
+
+        //Lab4 - Part4 - #2
+        [HttpPost("DeleteConfirmed/{id:int?}")] //Lab6-Part2#1
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id) //Lab9
+        {
+            var project = await _context.Projects.FindAsync(id); //Lab9
+            if (project != null)
             {
                 _context.Projects.Remove(project);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync(); //Lab9
                 return RedirectToAction("Index");
             }
-            
-            return View((project))
+            return NotFound();
+        }
+
+        // Lab 6 - Project Search Functionality
+        // Custom route for search functionality
+        // Accessible at /Projects/Search/{searchString?}
+        [HttpGet("Search/{searchString?}")]
+        public async Task<IActionResult> Search(string searchString)
+        {
+            // Fetch all projects from the database as an IQueryable collection
+            // IQueryable allows us to apply filters before executing the database query
+            var projectsQuery = _context.Projects.AsQueryable();
+
+            // Check if a search string was provided (avoids null or empty search issues)
+            bool searchPerformed = !string.IsNullOrWhiteSpace(searchString);
+
+            if (searchPerformed)
+            {
+                // Convert searchString to lowercase to make the search case-insensitive
+                searchString = searchString.ToLower();
+
+                // Apply filtering: Match project name or description
+                // Query ensures p.Name is checked first before calling ToLower() to prevent NullReferenceException
+                projectsQuery = projectsQuery.Where(p =>
+                    p.Name.ToLower().Contains(searchString) ||
+                    (p.Description != null && p.Description.ToLower().Contains(searchString)));
+            }
+
+            // Execute the query asynchronously using `ToListAsync()`
+            var projects = await projectsQuery.ToListAsync();
+
+            // Store search metadata for the view
+            ViewData["SearchPerformed"] = searchPerformed;
+            ViewData["SearchString"] = searchString;
+
+            // Return the filtered list to the Index view (reusing existing UI)
+            return View("Index", projects);
         }
     }
+}
