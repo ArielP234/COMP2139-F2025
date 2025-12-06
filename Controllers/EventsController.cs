@@ -18,10 +18,7 @@ namespace VirtualEventTicketing.Controllers
        public async Task<IActionResult> Index(string searchString, int? categoryId, string sortOrder)
        {
            var events = _context.Events.Include(e => e.Category).AsQueryable();
-       
-           // REMOVE THIS LINE - no date filtering
-           // var currentTime = DateTime.UtcNow;
-           // events = events.Where(e => e.Date > currentTime);
+           
        
            if (!string.IsNullOrEmpty(searchString))
            {
@@ -172,7 +169,27 @@ namespace VirtualEventTicketing.Controllers
 
             return View(viewModel);
         }
+        [HttpGet]
+        public IActionResult Search(string term)
+        {
+            var query = _context.Events.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                term = term.Trim();
+                query = query.Where(e =>
+                    e.Title.Contains(term) ||
+                    e.Description.Contains(term));
+            }
+
+            var events = query
+                .OrderBy(e => e.Date)
+                .ToList();
+
+            return PartialView("_EventListPartial", events);
+        }
 
         private bool EventExists(int id) => _context.Events.Any(e => e.Id == id);
     }
+    
 }
