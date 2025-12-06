@@ -1,0 +1,12 @@
+﻿@model IEnumerable<VirtualEventTicketing.Models.Event>
+
+@foreach (var e in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4>@e.Title</h4>
+            <p>@e.Description</p>
+            <p><strong>Date:</strong> @e.Date.ToString("MMM dd, yyyy hh:mm tt")</p>
+        </div>
+    </div>
+}

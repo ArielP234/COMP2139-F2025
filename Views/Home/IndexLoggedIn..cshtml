@@ -1,0 +1,39 @@
+﻿@model IEnumerable<VirtualEventTicketing.Models.Event>
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h2 class="mb-3">Welcome back, @ViewBag.UserName!</h2>
+
+<div class="mb-4">
+    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-lg">
+        Go to Dashboard
+    </a>
+</div>
+
+<h3>Upcoming Events</h3>
+
+@if (!Model.Any())
+{
+    <p>No upcoming events.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var e in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@e.Title</h5>
+                        <p class="card-text">@e.Description</p>
+                        <p>
+                            <strong>Date:</strong> @e.Date.ToString("MMM dd, yyyy hh:mm tt")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -22,5 +22,8 @@ namespace VirtualEventTicketing.Models
         public decimal TotalAmount { get; set; }
 
         public ICollection<PurchaseItem> PurchaseItems { get; set; } = new List<PurchaseItem>();
+        
+        public string? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }

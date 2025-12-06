@@ -1,0 +1,29 @@
+﻿@model IEnumerable<VirtualEventTicketing.Models.Purchase>
+
+@{
+    ViewData["Title"] = "My Tickets";
+}
+
+<h2>My Tickets</h2>
+
+@if (!Model.Any())
+{
+    <p>You have no tickets yet.</p>
+}
+else
+{
+    foreach (var p in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>Purchase @p.Id on @p.PurchaseDate.ToString("g")</h5>
+                <ul>
+                    @foreach (var item in p.PurchaseItems)
+                    {
+                        <li>@item.Event.Title - @item.Quantity ticket(s)</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+}

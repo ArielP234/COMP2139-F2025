@@ -30,16 +30,9 @@ namespace VirtualEventTicketing.Models
 
         public Category? Category { get; set; }
         public ICollection<PurchaseItem> PurchaseItems { get; set; } = new List<PurchaseItem>();
+        
+        public string? OrganizerId { get; set; }
+        public ApplicationUser? Organizer { get; set; }
     }
-
-    // COMMENT OUT or REMOVE the FutureDateAttribute for now
-    /*
-    public class FutureDateAttribute : ValidationAttribute
-    {
-        public override bool IsValid(object? value)
-        {
-            return value is DateTime date && date > DateTime.Now;
-        }
-    }
-    */
+    
 }
