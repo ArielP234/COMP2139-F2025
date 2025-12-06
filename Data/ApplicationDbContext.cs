@@ -1,20 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VirtualEventTicketing.Models;
 
 namespace VirtualEventTicketing.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
 
-        public DbSet<Event> Events { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Purchase> Purchases { get; set; }
-        public DbSet<PurchaseItem> PurchaseItems { get; set; }
+        public DbSet<Event> Events { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<Purchase> Purchases { get; set; } = null!;
+        public DbSet<PurchaseItem> PurchaseItems { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Simple setup without complex relationships
+            base.OnModelCreating(modelBuilder);
+            // add custom relationships here if you want later
         }
     }
 }
